@@ -1,0 +1,33 @@
+services:
+  grpc:
+    build:
+      context: .\docker\grpc
+    volumes:
+      - .\docker\grpc\app:C:\app
+      - .\docs:C:\docs
+    tty: true
+    expose:
+      - 50051
+    links:
+      - redoc
+  redoc:
+    build:
+      context: .\docker\redoc
+    volumes:
+      - .\docker\redoc:C:\redoc
+      - .\docs:C:\docs
+    working_dir: C:\redoc
+    tty: true
+    ports:
+      - "8000:8080"
+  envoy:
+    image: envoyproxy/envoy-windows:v1.28-latest
+    volumes:
+      - .\docker\envoy:C:\envoy
+      - .\docker\grpc\app\protos:C:\protos
+    expose:
+      - 51051
+    ports:
+      - 51051:51051
+    links:
+      - grpc
